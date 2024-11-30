@@ -25,3 +25,15 @@ function mapTodos(array $todos, array $positions, Closure $callback): array
 
     return array_values($todos);
 }
+
+function createTodo(string $title): array
+{
+    return [
+        'id' => uniqid(),
+        'title' => $title,
+        'completed' => false,
+        'created_at' => time(),
+        'updated_at' => null,
+        'completed_at' => null,
+    ];
+}

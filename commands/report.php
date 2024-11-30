@@ -22,8 +22,8 @@ function reportCommand(array $arguments = []): void
 
     if ($totalDays > 0)
     {
-        $averageTasksCount = floor($totalTasksCount / $totalDays, 0);
-        $averageCompletedTasksCount = floor($totalCompletedTasksCount / $totalDays, 0);
+        $averageTasksCount = floor($totalTasksCount / $totalDays);
+        $averageCompletedTasksCount = floor($totalCompletedTasksCount / $totalDays);
     }
 
     $report = [

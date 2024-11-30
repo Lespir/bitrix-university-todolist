@@ -41,3 +41,11 @@ function storeTodos(array $todos, ?int $time = null): void
 
     file_put_contents($filePath, serialize($todos));
 }
+
+function addTodo(array $todo, ?int $time = null): void
+{
+    $todos = getTodos($time);
+    $todos[] = $todo;
+
+    storeTodos($todos);
+}
