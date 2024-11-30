@@ -4,5 +4,8 @@ CREATE TABLE IF NOT EXISTS todos (
     completed VARCHAR(1) NOT NULL DEFAULT 'N',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NULL DEFAULT NULL,
-    completed_at DATETIME NULL DEFAULT NULL,
+    completed_at DATETIME NULL DEFAULT NULL
 );
+
+INSERT INTO todos (id, title) VALUES ('123', 'wake up');
+INSERT INTO todos (id, title) VALUES ('456', 'go sleep');

@@ -2,17 +2,37 @@
 
 function getTodos(?int $time = null): array
 {
-    $filePath = getRepositoryPath($time);
+	$connection = getDbConnect();
 
-    if (!file_exists($filePath))
-    {
-        return [];
-    }
+	$from = date('Y-m-d 00:00:00', $time);
+	$to = date('Y-m-d 23:59:59', $time);
 
-    $content = file_get_contents($filePath);
-    $todos = unserialize($content, ['allowed_classes' => false,]);
+	$result = mysqli_query($connection, "
+		SELECT * FROM todos
+		WHERE created_at BETWEEN '{$from}' AND '{$to}'
+		ORDER BY created_at
+		LIMIT 100;
+	");
+	if (!$result)
+	{
+		throw new Exception(mysqli_error($connection));
+	}
 
-    return is_array($todos) ? $todos : [];
+	$todos = [];
+	while ($row = mysqli_fetch_assoc($result))
+	{
+		$todos[] = [
+			'id' => $row['id'],
+			'title' => $row['title'],
+			'completed' => ($row['completed'] === 'Y'),
+			'created_at' => strtotime($row['created_at']),
+			'updated_at' => $row['updated_at'] ? strtotime($row['updated_at']) : null,
+			'completed_at' => $row['completed_at'] ? strtotime($row['completed_at']) : null,
+		];
+	}
+
+	return $todos;
+
 }
 
 function getTodosOrFail(?int $time = null): array
@@ -27,25 +47,22 @@ function getTodosOrFail(?int $time = null): array
     return $todos;
 }
 
-function getRepositoryPath(?int $time): string
+
+
+function addTodo(array $todo): bool
 {
-    $time = $time ?? time();
+	$connection = getDbConnect();
 
-    $fileName = date('Y-m-d', $time) . '.txt';
-    return ROOT . '/data/' . $fileName;
-}
+	$id = mysqli_real_escape_string($connection, $todo['id']);
+	$title = mysqli_real_escape_string($connection, $todo['title']);
 
-function storeTodos(array $todos, ?int $time = null): void
-{
-    $filePath = getRepositoryPath($time);
+	$sql = "INSERT INTO todos (id, title) VALUES ('{$id}', '{$title}');";
 
-    file_put_contents($filePath, serialize($todos));
-}
+	$result = mysqli_query($connection, $sql);
+	if (!$result)
+	{
+		throw new Exception(mysqli_error($connection));
+	}
 
-function addTodo(array $todo, ?int $time = null): void
-{
-    $todos = getTodos($time);
-    $todos[] = $todo;
-
-    storeTodos($todos);
+	return true;
 }
